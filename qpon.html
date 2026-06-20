@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#7C3AED" />
+  <meta name="description" content="Qpon — Never let a coupon expire again" />
+  <title>Qpon</title>
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --purple: #7C3AED;
+      --purple-light: #EDE9FE;
+      --purple-mid: #C4B5FD;
+      --pink: #EC4899;
+      --yellow: #FBBF24;
+      --green: #10B981;
+      --red: #EF4444;
+      --bg: #F5F3FF;
+      --card: #FFFFFF;
+      --text: #1E1B4B;
+      --muted: #6B7280;
+      --border: #E5E7EB;
+      --radius: 18px;
+      --shadow: 0 4px 24px rgba(124,58,237,0.10);
+      --sidebar-width: 260px;
+      /* category icon backgrounds */
+      --cat-food-bg: #FEF3C7;
+      --cat-shop-bg: #EDE9FE;
+      --cat-travel-bg: #DBEAFE;
+      --cat-ent-bg: #FCE7F3;
+      --cat-other-bg: #F3F4F6;
+      /* badge backgrounds */
+      --badge-ok-bg: #D1FAE5; --badge-ok-text: #065F46;
+      --badge-soon-bg: #FEE2E2; --badge-soon-text: #991B1B;
+      --badge-exp-bg: #F3F4F6; --badge-exp-text: #6B7280;
+      --badge-red-bg: #EDE9FE; --badge-red-text: #7C3AED;
+    }
+
+    [data-theme="dark"] {
+      --purple: #A78BFA;
+      --purple-light: #2E1B6B;
+      --purple-mid: #7C3AED;
+      --pink: #F472B6;
+      --yellow: #FCD34D;
+      --green: #34D399;
+      --red: #F87171;
+      --bg: #0F0D1A;
+      --card: #1A1730;
+      --text: #EDE9FE;
+      --muted: #9CA3AF;
+      --border: #2D2A4A;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --cat-food-bg: #3D2C0A;
+      --cat-shop-bg: #2A1F5C;
+      --cat-travel-bg: #0C2340;
+      --cat-ent-bg: #3D1229;
+      --cat-other-bg: #252333;
+      --badge-ok-bg: #064E3B; --badge-ok-text: #6EE7B7;
+      --badge-soon-bg: #450A0A; --badge-soon-text: #FCA5A5;
+      --badge-exp-bg: #252333; --badge-exp-text: #9CA3AF;
+      --badge-red-bg: #2E1B6B; --badge-red-text: #C4B5FD;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════
+       AUTH SCREEN
+    ═══════════════════════════════ */
+    .auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--bg);
+      overflow-y: auto;
+    }
+
+    .auth-wrapper {
+      display: flex;
+      width: 100%;
+      max-width: 900px;
+      min-height: 560px;
+      background: var(--card);
+      border-radius: 28px;
+      box-shadow: 0 8px 48px rgba(124,58,237,0.14);
+      overflow: hidden;
+    }
+
+    /* Left decorative panel — hidden on small screens */
+    .auth-panel {
+      flex: 1;
+      background: linear-gradient(145deg, var(--purple) 0%, #5B21B6 100%);
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-panel::before {
+      content: '';
+      position: absolute;
+      width: 260px; height: 260px;
+      background: var(--pink);
+      border-radius: 50%;
+      top: -80px; right: -80px;
+      opacity: 0.25;
+    }
+    .auth-panel::after {
+      content: '';
+      position: absolute;
+      width: 160px; height: 160px;
+      background: var(--yellow);
+      border-radius: 50%;
+      bottom: -50px; left: -40px;
+      opacity: 0.2;
+    }
+    .auth-panel-logo {
+      font-family: 'Nunito', sans-serif;
+      font-size: 52px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -2px;
+      position: relative; z-index: 1;
+    }
+    .auth-panel-logo span { color: var(--yellow); }
+    .auth-panel-tagline {
+      color: rgba(255,255,255,0.8);
+      font-size: 16px;
+      margin-top: 8px;
+      line-height: 1.5;
+      position: relative; z-index: 1;
+    }
+    .auth-panel-features {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative; z-index: 1;
+    }
+    .auth-feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .auth-feature-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* Right form panel */
+    .auth-form-panel {
+      flex: 1;
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .auth-form-logo {
+      font-family: 'Nunito', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--purple);
+      letter-spacing: -1.5px;
+      margin-bottom: 4px;
+      display: none; /* shown only on mobile */
+    }
+    .auth-form-logo span { color: var(--pink); }
+    .auth-form-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .auth-form-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      background: var(--card);
+      color: var(--purple);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .auth-input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.15s;
+    }
+    .auth-input:focus { border-color: var(--purple); }
+    .auth-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    }
+    .auth-btn:hover { transform: translateY(-2px); }
+    .auth-divider {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 16px 0;
+      position: relative;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 42%;
+      height: 1px;
+      background: var(--border);
+    }
+    .auth-divider::before { left: 0; }
+    .auth-divider::after { right: 0; }
+    .google-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--card);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .google-btn:hover { border-color: var(--purple); transform: translateY(-1px); }
+    .auth-error {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 8px;
+      text-align: center;
+      min-height: 20px;
+    }
+
+    /* ═══════════════════════════════
+       APP LAYOUT — DESKTOP SIDEBAR
+    ═══════════════════════════════ */
+    #app-screen {
+      display: none;
+      min-height: 100vh;
+    }
+
+    /* Desktop: sidebar + main content side by side */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR (desktop only) */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--purple);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 10;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: var(--pink);
+      border-radius: 50%;
+      top: -80px; right: -60px;
+      opacity: 0.2;
+    }
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      width: 140px; height: 140px;
+      background: var(--yellow);
+      border-radius: 50%;
+      bottom: -50px; left: -30px;
+      opacity: 0.15;
+    }
+    .sidebar-logo {
+      font-family: 'Nunito', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      padding: 32px 24px 8px;
+      position: relative; z-index: 1;
+    }
+    .sidebar-logo span { color: var(--yellow); }
+    .sidebar-greeting {
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      padding: 0 24px 28px;
+      position: relative; z-index: 1;
+    }
+
+    .sidebar-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 16px 24px;
+      position: relative; z-index: 1;
+    }
+    .sidebar-stat {
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sidebar-stat-num {
+      font-family: 'Nunito', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      min-width: 32px;
+    }
+    .sidebar-stat-num.red { color: #FCA5A5; }
+    .sidebar-stat-num.green { color: #6EE7B7; }
+    .sidebar-stat-label { font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 500; }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 12px;
+      position: relative; z-index: 1;
+    }
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.15s;
+      width: 100%;
+      text-align: left;
+    }
+    .sidebar-nav-item .nav-em { font-size: 18px; }
+    .sidebar-nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .sidebar-nav-item.active { background: rgba(255,255,255,0.2); color: #fff; }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 16px;
+      position: relative; z-index: 1;
+    }
+    .sidebar-add-btn {
+      width: 100%;
+      padding: 13px;
+      background: #fff;
+      color: var(--purple);
+      border: none;
+      border-radius: 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      transition: transform 0.15s;
+      margin-bottom: 10px;
+    }
+    .sidebar-add-btn:hover { transform: translateY(-2px); }
+    .sidebar-signout-btn {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.75);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sidebar-signout-btn:hover { background: rgba(255,255,255,0.18); }
+
+    /* MAIN CONTENT AREA */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* MOBILE HEADER (hidden on desktop) */
+    .mobile-header {
+      background: var(--purple);
+      padding: 20px 20px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mobile-header::before {
+      content: '';
+      position: absolute;
+      width: 180px; height: 180px;
+      background: var(--pink);
+      border-radius: 50%;
+      top: -60px; right: -50px;
+      opacity: 0.3;
+    }
+    .mobile-header::after {
+      content: '';
+      position: absolute;
+      width: 100px; height: 100px;
+      background: var(--yellow);
+      border-radius: 50%;
+      bottom: -30px; left: 16px;
+      opacity: 0.2;
+    }
+    .mobile-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative; z-index: 1;
+    }
+    .mobile-header-brand {
+      min-width: 0;
+      flex: 1;
+    }
+    .mobile-logo {
+      font-family: 'Nunito', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mobile-logo span { color: var(--yellow); }
+    .mobile-subtitle {
+      color: rgba(255,255,255,0.75);
+      font-size: 13px;
+      margin-top: 2px;
+      position: relative; z-index: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mobile-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative; z-index: 1;
+      flex-shrink: 0;
+    }
+    .mobile-add-btn {
+      background: #fff;
+      color: var(--purple);
+      border: none;
+      border-radius: 50px;
+      padding: 10px 18px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.15s;
+    }
+    .mobile-add-btn:hover { transform: translateY(-2px); }
+    .mobile-signout-btn {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 8px 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .mobile-signout-btn:hover { background: rgba(255,255,255,0.3); }
+
+    /* MOBILE STATS */
+    .mobile-stats {
+      display: flex;
+      gap: 10px;
+      padding: 0 16px;
+      margin-top: -18px;
+      position: relative; z-index: 2;
+    }
+    .stat-card {
+      flex: 1;
+      min-width: 0;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-num {
+      font-family: 'Nunito', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--purple);
+    }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* DESKTOP PAGE HEADER */
+    .desktop-page-header {
+      padding: 32px 36px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .desktop-page-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .desktop-page-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .desktop-add-btn {
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 22px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.3);
+      transition: transform 0.15s;
+    }
+    .desktop-add-btn:hover { transform: translateY(-2px); }
+
+    /* FILTERS */
+    .filters {
+      display: flex;
+      gap: 8px;
+      padding: 16px 20px 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      border: none;
+      border-radius: 50px;
+      padding: 7px 16px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      background: var(--card);
+      color: var(--muted);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .filter-btn.active { background: var(--purple); color: #fff; }
+
+    .section-label {
+      padding: 8px 20px 4px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    /* COUPON GRID — switches from 1 column to multi-column on desktop */
+    .coupons {
+      padding: 0 20px 40px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .coupon-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .coupon-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
+    .coupon-card.redeemed { opacity: 0.5; }
+    .coupon-card.expiring-soon::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--red);
+      border-radius: 4px 0 0 4px;
+    }
+    .cat-icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .cat-food { background: var(--cat-food-bg); }
+    .cat-shopping { background: var(--cat-shop-bg); }
+    .cat-travel { background: var(--cat-travel-bg); }
+    .cat-entertainment { background: var(--cat-ent-bg); }
+    .cat-other { background: var(--cat-other-bg); }
+    .coupon-info { flex: 1; min-width: 0; }
+    .coupon-name { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .coupon-code { font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--purple); font-weight: 700; margin-top: 2px; }
+    .coupon-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .expiry-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 50px; }
+    .badge-ok   { background: var(--badge-ok-bg);   color: var(--badge-ok-text); }
+    .badge-soon { background: var(--badge-soon-bg);  color: var(--badge-soon-text); }
+    .badge-expired  { background: var(--badge-exp-bg);  color: var(--badge-exp-text); }
+    .badge-redeemed { background: var(--badge-red-bg);  color: var(--badge-red-text); }
+    .coupon-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+    .icon-btn {
+      width: 32px; height: 32px;
+      border: none; border-radius: 10px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: transform 0.15s;
+    }
+    .icon-btn:hover { transform: scale(1.1); }
+    .btn-redeem { background: var(--badge-ok-bg); }
+    .btn-delete { background: var(--badge-soon-bg); }
+
+    /* ── DARK MODE TOGGLE ── */
+    .theme-toggle {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50px;
+      width: 38px; height: 38px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      transition: background 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.25); transform: scale(1.08); }
+
+    /* sidebar version — different background */
+    .sidebar-theme-toggle {
+      width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.08);
+      border: none; border-radius: 12px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.8);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 600;
+      margin-bottom: 8px;
+      transition: background 0.15s;
+    }
+    .sidebar-theme-toggle:hover { background: rgba(255,255,255,0.15); }
+    .toggle-pill {
+      width: 36px; height: 20px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.25s;
+    }
+    .toggle-pill::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 3px;
+      width: 14px; height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.25s;
+    }
+    [data-theme="dark"] .toggle-pill {
+      background: var(--purple);
+    }
+    [data-theme="dark"] .toggle-pill::after {
+      transform: translateX(16px);
+    }
+
+    /* Smooth theme transition on the whole page */
+    body, .auth-wrapper, .auth-form-panel, .auth-tabs,
+    .sidebar, .main-content, .coupon-card, .stat-card,
+    .filter-btn, .bottom-nav, .sheet, .overlay,
+    .desktop-page-header, .auth-input, input[type="text"], input[type="date"] {
+      transition: background 0.25s, color 0.2s, border-color 0.2s, box-shadow 0.25s;
+    }
+
+    /* ── DARK MODE SIDEBAR override (sidebar stays purple-ish but darker) ── */
+    [data-theme="dark"] .sidebar {
+      background: linear-gradient(180deg, #1A0F3C 0%, #0F0D1A 100%);
+    }
+    [data-theme="dark"] .mobile-header {
+      background: linear-gradient(135deg, #1A0F3C 0%, #2D1B69 100%);
+    }
+    [data-theme="dark"] .auth-wrapper {
+      box-shadow: 0 8px 48px rgba(0,0,0,0.5);
+    }
+    [data-theme="dark"] .auth-panel {
+      background: linear-gradient(145deg, #2D1B69 0%, #1A0F3C 100%);
+    }
+    [data-theme="dark"] .google-btn {
+      background: var(--card);
+      color: var(--text);
+    }
+
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* EMPTY */
+    .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-emoji { font-size: 56px; margin-bottom: 12px; }
+    .empty h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .empty p { font-size: 14px; line-height: 1.5; }
+
+    /* MODAL */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(30,27,75,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .sheet {
+      background: var(--card);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 24px 40px;
+      width: 100%;
+      max-width: 480px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .overlay.open .sheet { transform: translateY(0); }
+    .sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+    .sheet-title { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    input[type="text"], input[type="date"] {
+      width: 100%; padding: 13px 14px;
+      border: 2px solid var(--border); border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif; font-size: 16px;
+      color: var(--text); background: var(--bg);
+      transition: border-color 0.15s; outline: none; -webkit-appearance: none;
+    }
+    input:focus { border-color: var(--purple); }
+    .cat-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; }
+    .cat-option {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px; padding: 10px 4px;
+      border: 2px solid var(--border); border-radius: 12px;
+      cursor: pointer; font-size: 10px; font-weight: 600; color: var(--muted);
+      transition: all 0.15s; background: var(--bg);
+    }
+    .cat-option .cat-em { font-size: 22px; }
+    .cat-option.selected { border-color: var(--purple); background: var(--purple-light); color: var(--purple); }
+    .submit-btn {
+      width: 100%; padding: 15px;
+      background: var(--purple); color: #fff;
+      border: none; border-radius: 14px;
+      font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 800;
+      cursor: pointer; margin-top: 8px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    }
+    .submit-btn:hover { transform: translateY(-2px); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text); color: #fff;
+      padding: 12px 20px; border-radius: 50px;
+      font-size: 14px; font-weight: 600;
+      opacity: 0; transition: all 0.3s;
+      pointer-events: none; z-index: 200; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* MOBILE BOTTOM NAV */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--card); border-top: 1px solid var(--border);
+      display: flex; padding: 10px 0 calc(16px + env(safe-area-inset-bottom));
+      z-index: 9;
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      cursor: pointer; border: none; background: none; padding: 4px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .nav-item.active { color: var(--purple); }
+    .nav-icon { font-size: 22px; }
+
+    /* ═══════════════════════════════
+       RESPONSIVE BREAKPOINTS
+    ═══════════════════════════════ */
+
+    /* Small mobile — single column, all mobile UI */
+    @media (max-width: 767px) {
+      .auth-panel { display: none; }
+      .auth-wrapper {
+        max-width: 420px;
+        border-radius: 24px;
+      }
+      .auth-form-logo { display: block; }
+      .auth-form-panel { padding: 36px 28px; }
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+      .desktop-page-header { display: none; }
+      .mobile-header { display: block; }
+      .mobile-stats { display: flex; }
+      .bottom-nav { display: flex; }
+      .coupons { padding-bottom: 90px; }
+      .toast { bottom: calc(76px + env(safe-area-inset-bottom)); }
+    }
+
+    /* Extra-small phones (narrow Android devices, folded Galaxy Fold, etc.) */
+    @media (max-width: 359px) {
+      .auth-form-panel { padding: 28px 18px; }
+      .auth-panel-logo { font-size: 40px; }
+      .mobile-header-top { flex-wrap: wrap; row-gap: 12px; }
+      .mobile-add-btn { padding: 9px 14px; font-size: 13px; }
+      .mobile-signout-btn { padding: 8px 10px; font-size: 12px; }
+      .mobile-stats { gap: 6px; }
+      .stat-card { padding: 10px 6px; }
+      .stat-num { font-size: 18px; }
+      .cat-grid { grid-template-columns: repeat(3, 1fr); }
+      .sheet { padding: 20px 16px 32px; }
+    }
+
+    /* Tablet — hide sidebar, keep mobile header, go 2-col grid */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .auth-panel { display: none; }
+      .auth-wrapper { max-width: 480px; }
+      .auth-form-logo { display: block; }
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+      .desktop-page-header { display: flex; }
+      .mobile-header { display: none; }
+      .mobile-stats { display: none; }
+      .bottom-nav { display: none; }
+      .coupons { grid-template-columns: repeat(2, 1fr); padding-bottom: 40px; }
+      .filters { padding: 16px 36px 8px; }
+      .section-label { padding: 8px 36px 4px; }
+      .coupons { padding: 0 36px 40px; }
+    }
+
+    /* Desktop — sidebar visible, 2-col grid */
+    @media (min-width: 1024px) {
+      .auth-panel { display: flex; }
+      .auth-form-logo { display: none; }
+      .auth-form-panel { padding: 48px 48px; }
+      .sidebar { display: flex; }
+      .main-content { margin-left: var(--sidebar-width); }
+      .desktop-page-header { display: flex; }
+      .mobile-header { display: none; }
+      .mobile-stats { display: none; }
+      .bottom-nav { display: none; }
+      .coupons { grid-template-columns: repeat(2, 1fr); padding-bottom: 40px; }
+      .filters { padding: 16px 36px 8px; }
+      .section-label { padding: 8px 36px 4px; }
+      .coupons { padding: 0 36px 40px; }
+    }
+
+    /* Wide desktop — 3-col coupon grid */
+    @media (min-width: 1400px) {
+      :root { --sidebar-width: 280px; }
+      .coupons { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Ultra-wide monitors — keep cards from stretching too wide */
+    @media (min-width: 1800px) {
+      .coupons { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* Short or landscape viewports — keep the auth card reachable instead of
+       letting flex centering clip its top edge off-screen */
+    @media (max-height: 700px) {
+      .auth-screen { align-items: flex-start; padding-top: 32px; padding-bottom: 32px; }
+      .auth-wrapper { min-height: auto; }
+    }
+    @media (max-height: 480px) and (max-width: 767px) {
+      .mobile-header { padding: 14px 20px 24px; }
+      .mobile-stats { margin-top: -14px; }
+    }
+
+    /* Modal centered on desktop */
+    @media (min-width: 768px) {
+      .overlay {
+        align-items: center;
+      }
+      .sheet {
+        border-radius: 24px;
+        max-height: 85vh;
+        width: 480px;
+        transform: translateY(40px) scale(0.97);
+      }
+      .overlay.open .sheet {
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── AUTH SCREEN ── -->
+<div id="auth-screen" class="auth-screen">
+  <button class="theme-toggle" id="auth-theme-toggle" title="Toggle dark mode" style="position:fixed;top:calc(16px + env(safe-area-inset-top));right:calc(16px + env(safe-area-inset-right));z-index:10;background:var(--card);border:2px solid var(--border);">🌙</button>
+  <div class="auth-wrapper">
+    <!-- Left decorative panel -->
+    <div class="auth-panel">
+      <div class="auth-panel-logo">Q<span>p</span>on</div>
+      <div class="auth-panel-tagline">Your personal coupon wallet — never let a deal slip away again.</div>
+      <div class="auth-panel-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🎟️</div>
+          <span>Save coupons from any brand</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">⏰</div>
+          <span>Get alerts before they expire</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">✅</div>
+          <span>Track what you've redeemed</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">📱</div>
+          <span>Works on mobile & desktop</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right form panel -->
+    <div class="auth-form-panel">
+      <div class="auth-form-logo">Q<span>p</span>on</div>
+      <div class="auth-form-title">Welcome back 👋</div>
+      <div class="auth-form-subtitle">Sign in to your coupon wallet</div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login">Log In</button>
+        <button class="auth-tab" id="tab-signup">Sign Up</button>
+      </div>
+      <input class="auth-input" id="auth-email" type="email" placeholder="Email address" />
+      <input class="auth-input" id="auth-password" type="password" placeholder="Password" />
+      <button class="auth-btn" id="auth-submit-btn">Log In</button>
+      <div class="auth-error" id="auth-error"></div>
+      <div class="auth-divider">or</div>
+      <button class="google-btn" id="google-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP SCREEN ── -->
+<div id="app-screen">
+  <div class="app-layout">
+
+    <!-- SIDEBAR (desktop) -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">Q<span>p</span>on</div>
+      <div class="sidebar-greeting" id="sidebar-greeting">Hey there! 👋</div>
+
+      <div class="sidebar-stats">
+        <div class="sidebar-stat">
+          <div class="sidebar-stat-num" id="sb-stat-active">0</div>
+          <div class="sidebar-stat-label">Active coupons</div>
+        </div>
+        <div class="sidebar-stat">
+          <div class="sidebar-stat-num red" id="sb-stat-expiring">0</div>
+          <div class="sidebar-stat-label">Expiring soon</div>
+        </div>
+        <div class="sidebar-stat">
+          <div class="sidebar-stat-num green" id="sb-stat-redeemed">0</div>
+          <div class="sidebar-stat-label">Redeemed</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item active" data-filter="all"><span class="nav-em">🏠</span> All Coupons</button>
+        <button class="sidebar-nav-item" data-filter="expiring"><span class="nav-em">⏰</span> Expiring Soon</button>
+        <button class="sidebar-nav-item" data-filter="food"><span class="nav-em">🍔</span> Food</button>
+        <button class="sidebar-nav-item" data-filter="shopping"><span class="nav-em">🛍️</span> Shopping</button>
+        <button class="sidebar-nav-item" data-filter="travel"><span class="nav-em">✈️</span> Travel</button>
+        <button class="sidebar-nav-item" data-filter="entertainment"><span class="nav-em">🎬</span> Entertainment</button>
+        <button class="sidebar-nav-item" data-filter="other"><span class="nav-em">📦</span> Other</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="sidebar-add-btn" id="sidebar-add-btn">＋ Add Coupon</button>
+        <button class="sidebar-theme-toggle" id="sidebar-theme-toggle">
+          <span id="sidebar-theme-label">Dark Mode</span>
+          <div class="toggle-pill"></div>
+        </button>
+        <button class="sidebar-signout-btn" id="sidebar-signout-btn">Sign out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+      <!-- Mobile header -->
+      <header class="mobile-header">
+        <div class="mobile-header-top">
+          <div class="mobile-header-brand">
+            <div class="mobile-logo">Q<span>p</span>on</div>
+            <div class="mobile-subtitle" id="mobile-greeting">Never let a deal slip away 🎉</div>
+          </div>
+          <div class="mobile-header-right">
+            <button class="theme-toggle" id="mobile-theme-toggle" title="Toggle dark mode">🌙</button>
+            <button class="mobile-add-btn" id="mobile-add-btn">＋ Add</button>
+            <button class="mobile-signout-btn" id="mobile-signout-btn">Out</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Mobile stats -->
+      <div class="mobile-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-active">0</div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-expiring" style="color:var(--red)">0</div>
+          <div class="stat-label">Expiring Soon</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-redeemed" style="color:var(--green)">0</div>
+          <div class="stat-label">Redeemed</div>
+        </div>
+      </div>
+
+      <!-- Desktop page header -->
+      <div class="desktop-page-header">
+        <div>
+          <div class="desktop-page-title" id="desktop-page-title">Your Coupons</div>
+          <div class="desktop-page-subtitle" id="desktop-page-subtitle">All your saved deals in one place</div>
+        </div>
+        <button class="desktop-add-btn" id="desktop-add-btn">＋ Add Coupon</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="food">🍔 Food</button>
+        <button class="filter-btn" data-filter="shopping">🛍️ Shopping</button>
+        <button class="filter-btn" data-filter="travel">✈️ Travel</button>
+        <button class="filter-btn" data-filter="entertainment">🎬 Entertainment</button>
+        <button class="filter-btn" data-filter="other">📦 Other</button>
+      </div>
+
+      <div class="section-label" id="section-label">All Coupons</div>
+      <div class="coupons" id="coupon-list">
+        <div class="loading"><div class="spinner"></div>Loading your coupons...</div>
+      </div>
+    </div><!-- /main-content -->
+  </div><!-- /app-layout -->
+
+  <!-- Mobile bottom nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-filter="all"><span class="nav-icon">🏠</span> Home</button>
+    <button class="nav-item" id="nav-add-btn"><span class="nav-icon">➕</span> Add</button>
+    <button class="nav-item" data-filter="expiring"><span class="nav-icon">⏰</span> Expiring</button>
+  </nav>
+</div><!-- /app-screen -->
+
+<!-- ── ADD COUPON MODAL ── -->
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add a Coupon ✂️</div>
+    <div class="form-group">
+      <label>Coupon / Brand Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Swiggy, Zomato, H&M" />
+    </div>
+    <div class="form-group">
+      <label>Code or Value</label>
+      <input type="text" id="f-code" placeholder="e.g. SAVE50 or ₹200 off" />
+    </div>
+    <div class="form-group">
+      <label>Expiry Date</label>
+      <input type="date" id="f-expiry" />
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <div class="cat-grid">
+        <div class="cat-option selected" data-cat="food"><span class="cat-em">🍔</span>Food</div>
+        <div class="cat-option" data-cat="shopping"><span class="cat-em">🛍️</span>Shop</div>
+        <div class="cat-option" data-cat="travel"><span class="cat-em">✈️</span>Travel</div>
+        <div class="cat-option" data-cat="entertainment"><span class="cat-em">🎬</span>Fun</div>
+        <div class="cat-option" data-cat="other"><span class="cat-em">📦</span>Other</div>
+      </div>
+    </div>
+    <button class="submit-btn" id="save-btn">Save Coupon 🎉</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── FIREBASE ── -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+    createUserWithEmailAndPassword, GoogleAuthProvider,
+    signInWithPopup, signOut as fbSignOut
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore, collection, addDoc, doc,
+    updateDoc, deleteDoc, query, where, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAiT-RgdQbqZn6k9UTZcb7Oh8Ox53QjlxQ",
+    authDomain: "qpon-psr.firebaseapp.com",
+    projectId: "qpon-psr",
+    storageBucket: "qpon-psr.firebasestorage.app",
+    messagingSenderId: "24881572140",
+    appId: "1:24881572140:web:2bc4df9d938452f15ae489"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── STATE ──
+  let currentUser  = null;
+  let coupons      = [];
+  let activeFilter = 'all';
+  let selectedCat  = 'food';
+  let authMode     = 'login';
+  let unsubscribe  = null;
+
+  // ── HELPERS ──
+  const catEmoji = { food:'🍔', shopping:'🛍️', travel:'✈️', entertainment:'🎬', other:'📦' };
+  const catClass = { food:'cat-food', shopping:'cat-shopping', travel:'cat-travel', entertainment:'cat-entertainment', other:'cat-other' };
+
+  function daysUntil(dateStr) {
+    const now = new Date(); now.setHours(0,0,0,0);
+    return Math.round((new Date(dateStr) - now) / 86400000);
+  }
+  function expiryLabel(c) {
+    if (c.redeemed) return { text:'✓ Redeemed', cls:'badge-redeemed' };
+    const d = daysUntil(c.expiry);
+    if (d < 0)   return { text:'Expired',       cls:'badge-expired' };
+    if (d === 0) return { text:'Expires today!', cls:'badge-soon' };
+    if (d <= 3)  return { text:`${d}d left`,     cls:'badge-soon' };
+    return              { text:`${d}d left`,     cls:'badge-ok' };
+  }
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ── MODAL ──
+  function openModal() {
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('f-expiry').min = new Date().toISOString().split('T')[0];
+  }
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  // ── SYNC FILTER BUTTONS ──
+  function syncFilterUI(filter) {
+    // top filter bar
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    // sidebar nav
+    document.querySelectorAll('.sidebar-nav-item').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    // bottom nav
+    document.querySelectorAll('.bottom-nav .nav-item[data-filter]').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+  }
+
+  // ── RENDER ──
+  function render() {
+    const list  = document.getElementById('coupon-list');
+    const sectionLabel = document.getElementById('section-label');
+    const desktopTitle = document.getElementById('desktop-page-title');
+    const desktopSub   = document.getElementById('desktop-page-subtitle');
+    let filtered = coupons;
+
+    const filterLabels = {
+      all:           ['Your Coupons',      'All your saved deals in one place'],
+      expiring:      ['⏰ Expiring Soon',   'Deals you need to use fast'],
+      food:          ['🍔 Food',            'Restaurant & delivery coupons'],
+      shopping:      ['🛍️ Shopping',        'Retail & e-commerce deals'],
+      travel:        ['✈️ Travel',          'Flights, hotels & transport'],
+      entertainment: ['🎬 Entertainment',   'Movies, streaming & events'],
+      other:         ['📦 Other',           'Everything else'],
+    };
+
+    const [title, subtitle] = filterLabels[activeFilter] || ['Your Coupons', ''];
+    sectionLabel.textContent = title;
+    desktopTitle.textContent = title;
+    desktopSub.textContent   = subtitle;
+
+    if (activeFilter === 'expiring') {
+      filtered = coupons.filter(c => !c.redeemed && daysUntil(c.expiry) <= 3 && daysUntil(c.expiry) >= 0);
+    } else if (activeFilter !== 'all') {
+      filtered = coupons.filter(c => c.category === activeFilter);
+    }
+
+    filtered = [...filtered].sort((a,b) => {
+      if (a.redeemed && !b.redeemed) return 1;
+      if (!a.redeemed && b.redeemed) return -1;
+      return daysUntil(a.expiry) - daysUntil(b.expiry);
+    });
+
+    const activeCount   = coupons.filter(c => !c.redeemed && daysUntil(c.expiry) >= 0).length;
+    const expiringCount = coupons.filter(c => !c.redeemed && daysUntil(c.expiry) <= 3 && daysUntil(c.expiry) >= 0).length;
+    const redeemedCount = coupons.filter(c => c.redeemed).length;
+
+    // sync all stat displays
+    ['stat-active','sb-stat-active'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.textContent = activeCount;
+    });
+    ['stat-expiring','sb-stat-expiring'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.textContent = expiringCount;
+    });
+    ['stat-redeemed','sb-stat-redeemed'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.textContent = redeemedCount;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty" style="grid-column:1/-1">
+        <div class="empty-emoji">${activeFilter==='expiring'?'🥳':'🎟️'}</div>
+        <h3>${activeFilter==='expiring'?'Nothing expiring soon!':'No coupons here yet'}</h3>
+        <p>${activeFilter==='expiring'?"You're all good — no deals slipping away.":'Tap ＋ Add to save your first coupon.'}</p>
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(c => {
+      const {text,cls} = expiryLabel(c);
+      const soon = !c.redeemed && daysUntil(c.expiry) <= 3 && daysUntil(c.expiry) >= 0;
+      return `<div class="coupon-card ${c.redeemed?'redeemed':''} ${soon?'expiring-soon':''}">
+        <div class="cat-icon ${catClass[c.category]||'cat-other'}">${catEmoji[c.category]||'📦'}</div>
+        <div class="coupon-info">
+          <div class="coupon-name">${c.name}</div>
+          <div class="coupon-code">${c.code}</div>
+          <div class="coupon-meta"><span class="expiry-badge ${cls}">${text}</span></div>
+        </div>
+        <div class="coupon-actions">
+          ${!c.redeemed?`<button class="icon-btn btn-redeem" data-id="${c.id}" data-action="redeem" title="Mark as redeemed">✓</button>`:''}
+          <button class="icon-btn btn-delete" data-id="${c.id}" data-action="delete" title="Delete coupon">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', async e => {
+        const id     = e.currentTarget.dataset.id;
+        const action = e.currentTarget.dataset.action;
+        if (action === 'redeem') {
+          await updateDoc(doc(db,'coupons',id), { redeemed: true });
+          showToast('Marked as redeemed ✓');
+        } else if (action === 'delete') {
+          await deleteDoc(doc(db,'coupons',id));
+          showToast('Coupon removed 🗑️');
+        }
+      });
+    });
+  }
+
+  // ── FIRESTORE LISTENER ──
+  function listenToCoupons(uid) {
+    if (unsubscribe) unsubscribe();
+    const q = query(collection(db,'coupons'), where('userId','==',uid));
+    unsubscribe = onSnapshot(q, snap => {
+      coupons = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      render();
+    });
+  }
+
+  // ── FILTER CHANGE ──
+  function setFilter(filter) {
+    activeFilter = filter;
+    syncFilterUI(filter);
+    render();
+  }
+
+  // ── AUTH STATE ──
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      currentUser = user;
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display  = 'block';
+      const name = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+      const greeting = `Hey ${name}! 👋`;
+      const mobileGreeting = document.getElementById('mobile-greeting');
+      const sidebarGreeting = document.getElementById('sidebar-greeting');
+      if (mobileGreeting) mobileGreeting.textContent = greeting;
+      if (sidebarGreeting) sidebarGreeting.textContent = greeting;
+      listenToCoupons(user.uid);
+    } else {
+      currentUser = null;
+      if (unsubscribe) unsubscribe();
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('app-screen').style.display  = 'none';
+    }
+  });
+
+  // ── AUTH TABS ──
+  document.getElementById('tab-login').addEventListener('click', () => {
+    authMode = 'login';
+    document.getElementById('tab-login').classList.add('active');
+    document.getElementById('tab-signup').classList.remove('active');
+    document.getElementById('auth-submit-btn').textContent = 'Log In';
+    document.getElementById('auth-error').textContent = '';
+    document.querySelector('.auth-form-title').textContent = 'Welcome back 👋';
+    document.querySelector('.auth-form-subtitle').textContent = 'Sign in to your coupon wallet';
+  });
+  document.getElementById('tab-signup').addEventListener('click', () => {
+    authMode = 'signup';
+    document.getElementById('tab-signup').classList.add('active');
+    document.getElementById('tab-login').classList.remove('active');
+    document.getElementById('auth-submit-btn').textContent = 'Sign Up';
+    document.getElementById('auth-error').textContent = '';
+    document.querySelector('.auth-form-title').textContent = 'Create account ✨';
+    document.querySelector('.auth-form-subtitle').textContent = 'Start saving coupons today';
+  });
+
+  // ── EMAIL AUTH ──
+  document.getElementById('auth-submit-btn').addEventListener('click', async () => {
+    const email    = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const errEl    = document.getElementById('auth-error');
+    errEl.textContent = '';
+    if (!email || !password) { errEl.textContent = 'Please enter email and password.'; return; }
+    try {
+      if (authMode === 'login') {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+    } catch(e) {
+      errEl.textContent = e.message.replace('Firebase: ','').replace(/\(auth.*\)\./,'');
+    }
+  });
+
+  // ── GOOGLE AUTH ──
+  document.getElementById('google-btn').addEventListener('click', async () => {
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    } catch(e) {
+      document.getElementById('auth-error').textContent = `${e.code} - ${e.message}`;
+    }
+  });
+
+  // ── SIGN OUT ──
+  async function doSignOut() {
+    await fbSignOut(auth);
+    showToast('Signed out 👋');
+  }
+  document.getElementById('mobile-signout-btn').addEventListener('click', doSignOut);
+  document.getElementById('sidebar-signout-btn').addEventListener('click', doSignOut);
+
+  // ── OPEN MODAL (all add buttons) ──
+  ['mobile-add-btn','desktop-add-btn','sidebar-add-btn','nav-add-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', openModal);
+  });
+
+  // ── CLOSE MODAL ──
+  document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('overlay')) closeModal();
+  });
+
+  // ── SAVE COUPON ──
+  document.getElementById('save-btn').addEventListener('click', async () => {
+    const name   = document.getElementById('f-name').value.trim();
+    const code   = document.getElementById('f-code').value.trim();
+    const expiry = document.getElementById('f-expiry').value;
+    if (!name || !code || !expiry) { showToast('Fill in all fields ✏️'); return; }
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true; btn.textContent = 'Saving...';
+    try {
+      await addDoc(collection(db,'coupons'), {
+        name, code, expiry,
+        category: selectedCat,
+        redeemed: false,
+        userId: currentUser.uid,
+        createdAt: new Date().toISOString()
+      });
+      closeModal();
+      showToast('Coupon saved! 🎉');
+      document.getElementById('f-name').value   = '';
+      document.getElementById('f-code').value   = '';
+      document.getElementById('f-expiry').value = '';
+    } catch(e) {
+      showToast('Error saving. Try again.');
+    }
+    btn.disabled = false; btn.textContent = 'Save Coupon 🎉';
+  });
+
+  // ── DARK MODE ──
+  const html = document.documentElement;
+  const THEME_KEY = 'qpon-theme';
+
+  function applyTheme(dark) {
+    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+    const icon = dark ? '☀️' : '🌙';
+    const mobileBtn = document.getElementById('mobile-theme-toggle');
+    const authBtn   = document.getElementById('auth-theme-toggle');
+    const sidebarLabel = document.getElementById('sidebar-theme-label');
+    if (mobileBtn) mobileBtn.textContent = icon;
+    if (authBtn)   authBtn.textContent   = icon;
+    if (sidebarLabel) sidebarLabel.textContent = dark ? 'Light Mode' : 'Dark Mode';
+  }
+
+  // Load saved preference; fall back to system preference
+  const saved = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let isDark = saved !== null ? saved === 'dark' : prefersDark;
+  applyTheme(isDark);
+
+  function toggleTheme() {
+    isDark = !isDark;
+    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+    applyTheme(isDark);
+  }
+
+  document.getElementById('mobile-theme-toggle').addEventListener('click', toggleTheme);
+  document.getElementById('sidebar-theme-toggle').addEventListener('click', toggleTheme);
+  document.getElementById('auth-theme-toggle').addEventListener('click', toggleTheme);
+
+  // ── CATEGORY SELECTION ──
+  document.querySelectorAll('.cat-option').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.cat-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedCat = el.dataset.cat;
+    });
+  });
+
+  // ── TOP FILTER BUTTONS ──
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+  });
+
+  // ── SIDEBAR NAV ──
+  document.querySelectorAll('.sidebar-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+  });
+
+  // ── BOTTOM NAV (mobile) ──
+  document.querySelectorAll('.bottom-nav .nav-item[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+  });
+</script>
+</body>
+</html>
