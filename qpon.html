@@ -1269,9 +1269,14 @@
 
   // ── MODAL ──
   function openModal() {
-    document.getElementById('overlay').classList.add('open');
-    document.getElementById('f-expiry').min = new Date().toISOString().split('T')[0];
-  }
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('f-expiry').min = new Date().toISOString().split('T')[0];
+  
+  // reset category to food
+  selectedCat = 'food';
+  document.querySelectorAll('.cat-option').forEach(o => o.classList.remove('selected'));
+  document.querySelector('[data-cat="food"]').classList.add('selected');
+}
   function closeModal() {
     document.getElementById('overlay').classList.remove('open');
   }
@@ -1383,6 +1388,11 @@
       btn.addEventListener('click', async e => {
         const id     = e.currentTarget.dataset.id;
         const action = e.currentTarget.dataset.action;
+        if (action === 'copy') {
+  navigator.clipboard.writeText(e.currentTarget.dataset.code);
+  showToast('Code copied! 📋');
+  return;
+}
         if (action === 'redeem') {
           await updateDoc(doc(db,'coupons',id), { redeemed: true });
           showToast('Marked as redeemed ✓');
