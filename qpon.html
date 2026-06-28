@@ -1366,7 +1366,10 @@
           <div class="cat-icon ${catClass[c.category]||'cat-other'}">${catEmoji[c.category]||'📦'}</div>
           <div class="coupon-info">
           <div class="coupon-name">${escapeHTML(c.name)}</div>
-          <div class="coupon-code">${escapeHTML(c.code)}</div>
+          <div class="coupon-code" style="display:flex;align-items:center;gap:6px;">
+  <span>${escapeHTML(c.code)}</span>
+  <button class="icon-btn" data-action="copy" data-code="${escapeHTML(c.code)}" title="Copy code" style="width:24px;height:24px;font-size:13px;background:var(--purple-light);color:var(--purple);flex-shrink:0;">📋</button>
+</div>
           <div class="coupon-meta"><span class="expiry-badge ${cls}">${text}</span></div>
         </div>
         <div class="coupon-actions">
