@@ -27,7 +27,7 @@ async function sendEmail(to, subject, html) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Qpon <reminders@qpon.netlify.app>',
+      from: 'Qpon <onboarding@resend.dev>',
       to,
       subject,
       html,
@@ -36,7 +36,7 @@ async function sendEmail(to, subject, html) {
   return res.json();
 }
 
-export default async function handler() {
+export const handler = async () => {
   const snapshot = await db.collection('coupons')
     .where('redeemed', '==', false)
     .get();
@@ -110,9 +110,7 @@ export default async function handler() {
     }
   }
 
-  return new Response(JSON.stringify({ reminders: reminders.length }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return { statusCode: 200, body: JSON.stringify({ reminders: reminders.length }) };
 }
 
 export const config = {
