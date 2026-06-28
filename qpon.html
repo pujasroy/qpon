@@ -1292,6 +1292,14 @@
     });
   }
 
+  function escapeHTML(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+  }
   // ── RENDER ──
   function render() {
     const list  = document.getElementById('coupon-list');
@@ -1355,10 +1363,10 @@
       const {text,cls} = expiryLabel(c);
       const soon = !c.redeemed && daysUntil(c.expiry) <= 3 && daysUntil(c.expiry) >= 0;
       return `<div class="coupon-card ${c.redeemed?'redeemed':''} ${soon?'expiring-soon':''}">
-        <div class="cat-icon ${catClass[c.category]||'cat-other'}">${catEmoji[c.category]||'📦'}</div>
-        <div class="coupon-info">
-          <div class="coupon-name">${c.name}</div>
-          <div class="coupon-code">${c.code}</div>
+          <div class="cat-icon ${catClass[c.category]||'cat-other'}">${catEmoji[c.category]||'📦'}</div>
+          <div class="coupon-info">
+          <div class="coupon-name">${escapeHTML(c.name)}</div>
+          <div class="coupon-code">${escapeHTML(c.code)}</div>
           <div class="coupon-meta"><span class="expiry-badge ${cls}">${text}</span></div>
         </div>
         <div class="coupon-actions">
