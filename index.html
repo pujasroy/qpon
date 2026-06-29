@@ -1604,7 +1604,6 @@
   });
 
   // ── OCR SCANNING ──
-const GEMINI_KEY = 'AQ.Ab8RN6I2FMrZ4oEhGlcip8a7AEIBLkWbTyGgtGuTcmFe_PPyhg';
 
 function toBase64(file) {
   return new Promise((resolve, reject) => {
@@ -1618,53 +1617,27 @@ function toBase64(file) {
 async function scanCouponImage(file) {
   const statusEl = document.getElementById('scan-status');
   statusEl.textContent = '🔍 Scanning coupon...';
+  statusEl.style.color = 'var(--purple)';
 
   try {
     const base64 = await toBase64(file);
     const mimeType = file.type || 'image/jpeg';
 
-    const response = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
-  {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GEMINI_KEY}`
-    },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                inline_data: { mime_type: mimeType, data: base64 }
-              },
-              {
-                text: `Extract coupon details from this image. Return ONLY valid JSON, no markdown, no explanation:
-{
-  "name": "brand or store name",
-  "code": "coupon code if visible, else null",
-  "value": "discount description e.g. 20% off or 100 off, else null",
-  "expiry": "YYYY-MM-DD format if found, else null",
-  "category": "one of: food, shopping, travel, entertainment, other"
-}`
-              }
-            ]
-          }]
-        })
-      }
-    );
+    const response = await fetch('/.netlify/functions/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageData: base64, mimeType })
+    });
 
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    const parsed = await response.json();
 
-    // Fill in the form fields
+    if (parsed.error) throw new Error(parsed.error);
+
     if (parsed.name) document.getElementById('f-name').value = parsed.name;
     if (parsed.code) document.getElementById('f-code').value = parsed.code;
     else if (parsed.value) document.getElementById('f-code').value = parsed.value;
     if (parsed.expiry) document.getElementById('f-expiry').value = parsed.expiry;
 
-    // Set category
     if (parsed.category) {
       document.querySelectorAll('.cat-option').forEach(o => o.classList.remove('selected'));
       const catEl = document.querySelector(`[data-cat="${parsed.category}"]`);
@@ -1680,7 +1653,6 @@ async function scanCouponImage(file) {
     statusEl.style.color = 'var(--red)';
   }
 }
-
 document.getElementById('scan-camera-btn').addEventListener('click', () => {
   document.getElementById('scan-camera-input').click();
 });

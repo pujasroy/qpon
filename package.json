@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/pujasroy/qpon#readme",
   "dependencies": {
+    "@google/genai": "^2.10.0",
     "firebase-admin": "^14.1.0"
   }
 }
