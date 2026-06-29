@@ -1,103 +1,64 @@
 # 🎟️ Qpon
-Link: https://qpon.netlify.app
+
+**Live:** https://qpon.netlify.app
 
 > Never let a coupon expire again.
 
-Qpon is a simple platform that helps you organize, track, and redeem coupons before they expire. Built with one goal in mind: **helping you save money by actually using the offers you already have.**
+Qpon is your personal coupon wallet — save, track, and redeem your deals before they slip away.
 
 ---
 
 ## ✨ Features
 
-### 📌 Add Coupons
-Save coupon details in seconds:
-- Coupon name
-- Coupon code or value
-- Expiry date
-- Category (Food, Shopping, Travel, Entertainment, etc.)
+### 📷 AI Coupon Scanning
+Scan any coupon image with your camera or upload one from your gallery. Gemini AI automatically extracts the brand name, coupon code, discount value, expiry date, and category — no typing needed.
 
-### ⏰ Smart Reminders
-Stay ahead with timely notifications:
-- 3 days before expiry
-- On the day of expiry
+### 📌 Add Coupons Manually
+Prefer to type it in? Add coupons in seconds with:
+- Brand / coupon name
+- Code or discount value
+- Expiry date
+- Category (Food, Shopping, Travel, Entertainment, Other)
+
+### ⏰ Email Reminders
+Get an email reminder **7 days** and **1 day** before a coupon expires — so you never miss a deal. Powered by Resend and automated daily via a scheduled serverless function.
 
 ### 🏠 Dashboard
-See all your coupons in one place, with **Expiring Soon** coupons front and center.
+All your coupons in one place, sorted by expiry. Expiring soon coupons are highlighted so the urgent ones are always front and center.
+
+### 🔍 Categories & Filters
+Filter coupons by category — Food, Shopping, Travel, Entertainment, or Other. Also has a dedicated **Expiring Soon** view.
 
 ### ✅ Mark as Redeemed
-Used a coupon? Mark it as redeemed with a single tap.
+Used a coupon? Mark it as redeemed with one tap. Redeemed coupons are kept for reference but stay out of your way.
+
+### 📋 Copy Code
+Tap the copy button on any coupon to instantly copy the code to your clipboard.
+
+### 🌙 Dark Mode
+Full dark mode support with smooth transitions. Remembers your preference.
+
+### 📱 Responsive Design
+Works great on mobile and desktop. Mobile gets a bottom nav and full-screen header; desktop gets a sidebar with stats.
 
 ---
 
-## 🚀 Planned Features
+## 🛠️ Tech Stack
 
-- 📷 Scan coupons from images
-- 🔍 Categories & filters
-- 💰 Savings insights
-- 🤝 Share coupons with friends and family
-- ☁️ Backup and sync across devices
-
----
-
-## 🎯 Why Qpon?
-
-Coupons are easy to collect—and even easier to forget.
-
-Qpon acts as your personal coupon vault, helping you:
-- Keep all your coupons in one place
-- Never miss an expiry date
-- Get more value from loyalty programs and offers
-- Save money without extra effort
+- **Frontend:** Vanilla HTML, CSS, JavaScript (single file)
+- **Auth & Database:** Firebase Authentication + Firestore
+- **Email:** Resend
+- **AI Scanning:** Google Gemini (via Netlify serverless function)
+- **Hosting & Functions:** Netlify
 
 ---
 
-## 📱 Screens
+## 💡 Why Qpon?
 
-- Home Dashboard
-- Add Coupon
-- Coupon Details
-- Expiring Soon View
-- Redeemed Coupons
+We've all found an expired coupon in an old email and thought — *"I wish I'd remembered this."*
+
+Qpon makes sure that never happens again.
 
 ---
 
-## 🗺️ Roadmap
-
-### MVP
-- [ ] Add coupons
-- [ ] View and manage coupons
-- [ ] Expiry reminders
-- [ ] Mark as redeemed
-- [ ] Dashboard with expiring soon section
-
-### V2
-- [ ] Coupon scanning
-- [ ] Filters and categories
-- [ ] Savings analytics
-- [ ] Coupon sharing
-- [ ] Device sync
-
-### Future
-- [ ] AI-powered coupon extraction
-- [ ] Smart recommendations
-- [ ] Shared family vault
-
----
-
-## 💡 Inspiration
-
-We've all discovered an expired coupon sitting in an email, wallet, or drawer and thought:
-
-*"I wish I had remembered this sooner."*
-
-Qpon exists to make sure that never happens again.
-
----
-
-## 📜 License
-
-MIT License
-
----
-
-### Save money. Use your coupons. 🎟️
+*Save money. Use your coupons. 🎟️*
