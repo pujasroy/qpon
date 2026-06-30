@@ -1152,6 +1152,9 @@
       </div>
 
       <!-- Filters -->
+      <div style="padding:16px 20px 0;">
+  <input type="text" id="search-input" placeholder="🔍 Search coupons..." style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:50px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--text);background:var(--card);outline:none;" />
+</div>
       <div class="filters">
         <button class="filter-btn active" data-filter="all">All</button>
         <button class="filter-btn" data-filter="food">🍔 Food</button>
@@ -1252,6 +1255,7 @@
   let currentUser  = null;
   let coupons      = [];
   let activeFilter = 'all';
+  let searchQuery = '';
   let selectedCat  = 'food';
   let authMode     = 'login';
   let unsubscribe  = null;
@@ -1325,6 +1329,9 @@
     const desktopTitle = document.getElementById('desktop-page-title');
     const desktopSub   = document.getElementById('desktop-page-subtitle');
     let filtered = coupons;
+    if (searchQuery) {
+  filtered = filtered.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+}
 
     const filterLabels = {
       all:           ['Your Coupons',      'All your saved deals in one place'],
@@ -1342,10 +1349,10 @@
     desktopSub.textContent   = subtitle;
 
     if (activeFilter === 'expiring') {
-      filtered = coupons.filter(c => !c.redeemed && daysUntil(c.expiry) <= 3 && daysUntil(c.expiry) >= 0);
-    } else if (activeFilter !== 'all') {
-      filtered = coupons.filter(c => c.category === activeFilter);
-    }
+  filtered = filtered.filter(c => !c.redeemed && daysUntil(c.expiry) <= 3 && daysUntil(c.expiry) >= 0);
+} else if (activeFilter !== 'all') {
+  filtered = filtered.filter(c => c.category === activeFilter);
+}
 
     filtered = [...filtered].sort((a,b) => {
       if (a.redeemed && !b.redeemed) return 1;
@@ -1588,6 +1595,11 @@
     });
   });
 
+  // ── SEARCH ──
+document.getElementById('search-input').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  render();
+});
   // ── TOP FILTER BUTTONS ──
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => setFilter(btn.dataset.filter));
