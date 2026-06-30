@@ -8,6 +8,7 @@
   <title>Qpon</title>
   <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
       --purple: #7C3AED;
@@ -1219,7 +1220,11 @@
         <div class="cat-option" data-cat="other"><span class="cat-em">📦</span>Other</div>
       </div>
     </div>
-    <button class="submit-btn" id="save-btn">Save Coupon 🎉</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+  <input type="checkbox" id="add-to-calendar" style="width:18px;height:18px;accent-color:var(--purple);" />
+  <label for="add-to-calendar" style="text-transform:none;font-weight:600;font-size:13px;color:var(--text);margin:0;">📅 Add reminder to Google Calendar</label>
+</div>
+<button class="submit-btn" id="save-btn">Save Coupon 🎉</button>
   </div>
 </div>
 
@@ -1238,6 +1243,9 @@
     updateDoc, deleteDoc, query, where, onSnapshot
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+  const GOOGLE_CLIENT_ID = '211272855938-hjjeqfbce77jq2jqmmelojrpjdi5q2fs.apps.googleusercontent.com';
+let calendarAccessToken = null;
+let tokenClient = null;
   const firebaseConfig = {
     apiKey: "AIzaSyAiT-RgdQbqZn6k9UTZcb7Oh8Ox53QjlxQ",
     authDomain: "qpon-psr.firebaseapp.com",
@@ -1250,6 +1258,63 @@
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = getFirestore(app);
+  window.addEventListener('load', () => {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/calendar.events',
+    callback: (response) => {
+      if (response.access_token) {
+        calendarAccessToken = response.access_token;
+      }
+    },
+  });
+});
+
+function ensureCalendarAccess() {
+  return new Promise((resolve) => {
+    if (calendarAccessToken) { resolve(true); return; }
+    tokenClient.callback = (response) => {
+      if (response.access_token) {
+        calendarAccessToken = response.access_token;
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    };
+    tokenClient.requestAccessToken({ prompt: 'consent' });
+  });
+}
+
+async function addCouponToCalendar(name, expiry) {
+  const hasAccess = await ensureCalendarAccess();
+  if (!hasAccess) return false;
+
+  const event = {
+    summary: `⏰ ${name} coupon expires today!`,
+    description: `Your ${name} coupon is expiring today. Don't forget to use it! — via Qpon`,
+    start: { date: expiry },
+    end: { date: expiry },
+    reminders: {
+      useDefault: false,
+      overrides: [{ method: 'popup', minutes: 9 * 60 }] // 9am reminder
+    }
+  };
+
+  try {
+    const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${calendarAccessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(event)
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('Calendar error:', err);
+    return false;
+  }
+}
 
   // ── STATE ──
   let currentUser  = null;
@@ -1577,6 +1642,12 @@ function openModal() {
           createdAt: new Date().toISOString()
         });
         showToast('Coupon saved! 🎉');
+
+        if (document.getElementById('add-to-calendar').checked) {
+          addCouponToCalendar(name, expiry).then(success => {
+            if (success) showToast('Added to Google Calendar! 📅');
+          });
+        }
       }
       closeModal();
       document.getElementById('f-name').value   = '';
